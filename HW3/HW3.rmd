@@ -1,0 +1,197 @@
+---
+title: "Regression Analysis HW3"
+author: "Tuorui Peng, tuoruipeng2028@u.northwestern.edu"
+documentclass: ctexart
+geometry: "left=2cm,right=2cm,top=2cm,bottom=2cm"
+output:
+    pdf_document:
+        latex_engine: xelatex
+---
+
+
+Notation: I use abbr $\mathrm{SMW}$ for Sherman-Morrison-Woodbury Formula, which we proved in the first homework.
+$$
+\begin{aligned}
+    (A+UCV')^{-1}=A^{-1}-A^{-1}U(C^{-1}+VA^{-1}U)^{-1}VA^{-1}
+\end{aligned}
+$$ 
+
+# Question 1.1
+
+$\hat{\beta }_{n+1}$ is obtained by
+$$
+\begin{aligned}
+    0=&\dfrac{\partial^{} }{\partial \beta ^{}}(Y-X\beta )'(Y-X\beta )+(y_{n+1}-x'_{n+1}\beta )^2\\
+    =& -2X'(Y-X\beta )+2(y_{n+1}-x'_{n+1}\beta )(-x_{n+1})\\
+    \Rightarrow & (X'X+x_{n+1}x_{n+1}')\beta =X'Y+x_{n+1}y_{n+1}\\
+    \Rightarrow & \beta =(X'X+x_{n+1}x_{n+1}')^{-1}(X'Y+x_{n+1}y_{n+1})\\
+    \mathop{=}\limits_{\mathrm{SMW}} & \big( I-\dfrac{(X'X)^{-1}x_{n+1}x_{n+1}'}{1+x_{n+1}'(X'X)^{-1}x_{n+1}} \big)(X'X)^{-1}(X'Y+x_{n+1}y_{n+1})\\
+    =&\big( I-\dfrac{(X'X)^{-1}x_{n+1}x_{n+1}'}{1+x_{n+1}'(X'X)^{-1}x_{n+1}} \big)\big( \hat{\beta }_n-(X'X)^{-1}x_{n+1}y_{n+1}' \big)
+\end{aligned}
+$$ 
+
+In which the computation cost is estimated as:
+
+- $(X'X)^{-1}x_{n+1}$: $O(d^2)$
+- $(X'X)^{-1}x_{n+1}x_{n+1}'$: $O(d)$
+- $x_{n+1}'(X'X)^{-1}x_{n+1}$: $O(d)$
+- $\big( I-\dfrac{(X'X)^{-1}x_{n+1}x_{n+1}'}{1+x_{n+1}'(X'X)^{-1}x_{n+1}} \big)\big( \hat{\beta }_n-(X'X)^{-1}x_{n+1}y_{n+1}' \big)$: $O(2d^2)$
+
+In total: $\sim O(3d^2+2d)$
+
+## Question 1.2
+
+Here I solve the sub-problem (b) directly, in which we just need to check the positive semi-definiteness of matrix $C_\rho\in\mathbb{R}^{n\times n}$, which is equivalent to check the sign of its determinants of $C_\rho \in\mathbb{R}^{m\times m},\,\forall m\leq n$:
+$$
+\begin{aligned}
+    \det \mathop{C_\rho}\limits_{m\times m}  =& \det \begin{bmatrix}
+        1&-\rho &\cdots &-\rho \\
+        -\rho &1 &\cdots &-\rho \\
+        \vdots &\vdots &\ddots &\vdots \\
+        -\rho &-\rho &\cdots &1
+    \end{bmatrix}_{m\times m}\\
+    =&\det \begin{bmatrix}
+        1 & -\rho & \cdots & -\rho \\
+        -1-\rho  & 1+\rho & \cdots & 0 \\
+        \vdots & \vdots & \ddots & \vdots \\
+        -1-\rho  & 0 & \cdots & 1+\rho
+    \end{bmatrix}_{m\times m}\\
+    =&\det \begin{bmatrix}
+        1-(m-1)\rho & -\rho & \cdots & -\rho \\
+        0  & 1+\rho & \cdots & 0 \\
+        \vdots & \vdots & \ddots & \vdots \\
+        0  & 0 & \cdots & 1+\rho
+    \end{bmatrix}_{m\times m} \\
+    =& (1-(m-1)\rho )\prod_{i=2}^{m}(1+\rho )=(1-(m-1)\rho )(1+\rho )^{m-1}
+\end{aligned}
+$$ 
+
+We have positive semi-definiteness of $\mathop{C_\rho}\limits_{n\times n}$ iff $1-(m-1)\rho \geq 0,\,\forall m\leq n$ iff $\rho \leq \dfrac{1}{n-1}$.
+
+## Question 1.3
+
+```{r, eval = TRUE, include = TRUE, warning = FALSE}
+wine <- read.csv("winequality-red.csv", sep = ";")
+pairs(wine[, c("quality", "density", "alcohol", "pH", "volatile.acidity")])
+```
+
+We have a strong positive relation between `quality` and `alcohol`, and a strong negative relation between `density` and `alcohol`. 
+
+
+## Question 1.5
+
+
+```{r, eval = TRUE, include = TRUE, warning = FALSE}
+sfo <- read.csv("simplified-sfo-weather.csv", sep = ",")
+```
+
+
+### (a)
+
+Verify directly we have
+$$
+\begin{aligned}
+    cov(Y-\hat{Y}, Y_\mathrm{new}-\hat{Y}_\mathrm{new} )=& cov\big( X\beta +\varepsilon -X(X'X)^{-1}X(X\beta +\varepsilon ), Z\beta +\varepsilon _\mathrm{new}- Z(X'X)^{-1}X'(X\beta +\varepsilon )  \big)\\
+    =& cov\big( (I-X(X'X)^{-1}X')\varepsilon , \varepsilon _\mathrm{new}- Z(X'X)^{-1}X'\varepsilon  \big)\\
+    =& cov\big( (I-X(X'X)^{-1}X')\varepsilon , - Z(X'X)^{-1}X'\varepsilon  \big)\\
+    =&-(I-X(X'X)^{-1}X')\sigma ^2I X(X'X)^{-1}Z'=0\\
+\end{aligned}
+$$ 
+
+### (b)
+
+We have
+$$
+\begin{aligned}
+    Y_\mathrm{new}-\hat{Y}_\mathrm{new}=& Z\beta +\varepsilon _\mathrm{new}- Z(X'X)^{-1}X'(X\beta +\varepsilon )\\
+    =& \varepsilon _\mathrm{new}- Z(X'X)^{-1}X'\varepsilon \\
+    \sim & N(0, \sigma ^2(I-Z(X'X)^{-1}Z') )\\
+\end{aligned}
+$$ 
+
+So the matrix $M$ s.t. $M(Y_\mathrm{new}-\hat{Y}_\mathrm{new})\sim N(0,\sigma^2 I)$ can be chosen as 
+$$
+\begin{aligned}
+    M=& (I-Z(X'X)^{-1}Z')^{-1/2}\\
+    \mathop{=}\limits_{\mathrm{SMW} } & \big( I-Z(X'X+Z'Z)^{-1}Z' \big)^{1/2}\\
+\end{aligned}
+$$ 
+
+### (c)
+
+Since we have proven the normality and the independence between $Y-\hat{Y}$ and $Y_\mathrm{new}-\hat{Y}_\mathrm{new}$ (which is equivalent to covariance being zero for normal variables), we have
+$$
+\begin{aligned}
+    A=\dfrac{\Vert M(Y_\mathrm{new}-\hat{Y}_\mathrm{new}) \Vert_2^2\big/ n }{\Vert Y-\hat{Y} \Vert_2^2\big/ (m-d) }\sim F_{n, m-d}
+\end{aligned}
+$$ 
+
+### (d) 
+
+
+
+```{r, eval = TRUE, include = TRUE, warning = FALSE}
+library("tidyverse")
+mat_inverse_sqrt <- function(mat) {
+    a <- eigen(mat)
+    idx <- which(a$value > 1e-8)
+    return(a$vector[, idx] %*% diag(1 / sqrt(a$value[idx])) %*% t(a$vector[, idx]))
+}
+
+f_stat <- function(X, Z, Y, Y_new) {
+    X <- as.matrix(X)
+    Z <- as.matrix(Z)
+    m <- nrow(X)
+    n <- nrow(Z)
+    d <- ncol(X)
+    beta <- solve(t(X) %*% X) %*% t(X) %*% Y
+    Y_hat <- X %*% beta
+    Y_new_hat <- Z %*% beta
+    eps <- Y - Y_hat
+    eps_new <- Y_new - Y_new_hat
+    M <- mat_inverse_sqrt(diag(n) - Z %*% solve(t(X) %*% X) %*% t(Z))
+    A <- (sum((M %*% eps_new)^2) / n) / (sum(eps^2) / (m - d))
+    return(A)
+}
+time_to_X <- function(date_seq) {
+    df <- data.frame(interc = rep(1, length(date_seq)), sincomp = sin(2 * pi * date_seq / 365.25), coscomp = cos(2 * pi * date_seq / 365.25))
+    return(df)
+}
+
+years <- c(1966:2020)
+p_values <- c()
+for (year in years) {
+    X <- time_to_X(sfo$day[sfo$year < year])
+    Z <- time_to_X(sfo$day[sfo$year == year])
+    Y <- sfo$precip[sfo$year < year]
+    Y_new <- sfo$precip[sfo$year == year]
+    dof1 <- nrow(Z)
+    dof2 <- nrow(X) - ncol(X)
+    p_values <- c(p_values, 1 - pf(f_stat(X, Z, Y, Y_new), dof1, dof2))
+}
+names(p_values) <- years
+p_values
+
+# plot of p-value v.s. year
+ggplot(data.frame(years = years, p_values = (p_values)), aes(x = years, y = p_values)) +
+    geom_line() +
+    geom_point() +
+    geom_hline(yintercept = 0.05, linetype = "dashed") +
+    labs(x = "year", y = "p-value") +
+    ggtitle("p-value of F-test for precipitation pattern change")
+
+# plot of log(p-value) v.s. year
+ggplot(data.frame(years = years, p_values = log(p_values)), aes(x = years, y = p_values)) +
+    geom_line() +
+    geom_point() +
+    labs(x = "year", y = "log(p-value)") +
+    ggtitle("log(p-value) of F-test for precipitation pattern change")
+```
+
+In the above we plotted log($p$-value) v.s. year plot and $p$-value v.s. year plot. Seems in most years we don't reject the null hypothesis that there's no change in the precipitation pattern. But there are some years we observe significant low $p$-value, suggesting a rejection to null hypothesis.
+
+### (e)
+
+I would say that 'changing over time' should be some kind of smooth, structural change, in which sense we should observe a long-range low $p$-value in the $p$-value v.s. year plot. But in the above plot we don't observe such a long-range low $p$-value. Actually we can see that in most of the years the $p$-value is nearly one, suggesting no change in the precipitation pattern. So I would say these 'outlier' $p$-values might just due to some occassional, short-term incidents happening in those years, instead of a long-term 'change in the precipitation pattern'.
+
+

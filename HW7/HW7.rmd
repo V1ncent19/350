@@ -1,0 +1,181 @@
+---
+title: "Regression Analysis HW7"
+author: "Tuorui Peng, tuoruipeng2028@u.northwestern.edu"
+documentclass: ctexart
+geometry: "left=2cm,right=2cm,top=2cm,bottom=2cm"
+output:
+    pdf_document:
+        extra_dependencies: ['bm']
+        latex_engine: xelatex
+---
+
+## (a)
+
+### (i)
+
+Use induction: if for $k\geq 0$ we have $(A-B)\sum_{i=0}^kA^{-1}(BA^{-1})^i=I-(BA^{-1})^{k+1}$, then at $k+1$:
+$$
+\begin{aligned}
+    (A-B)\sum_{i=0}^{k+1}A^{-1}(BA^{-1})^i= & (A-B)\sum_{0=1}^kA^{-1}(BA^{-1})^i + (A-B)A^{-1}(BA^{-1})^{k+1}\\
+    =&I-(BA^{-1})^{k+1} + (BA^{-1})^{k+1} - (BA^{-1})^{k+2}\\
+    =&I-(BA^{-1})^{k+2}
+\end{aligned}
+$$ 
+And notice that when $k=0$ we have
+$$
+\begin{aligned}
+    (A-B)\sum_{i=0}^{k=0}A^{-1}(BA^{-1})^i=(A-B)A^{-1}=I-BA^{-1}
+\end{aligned}
+$$ 
+So by induction, the statement is true for all $k\geq 1$.
+
+### (ii)
+
+We have
+$$
+\begin{aligned}
+    \left\vert\left\Vert BA^{-1} \right\Vert\right\vert _{\mathrm{op}} \leq \left\vert\left\Vert B \right\Vert\right\vert _{\mathrm{op}} \left\vert\left\Vert A^{-1} \right\Vert\right\vert _{\mathrm{op}} < 1\Rightarrow \left\vert\left\Vert (BA^{-1})^{k+1} \right\Vert\right\vert _{\mathrm{op}} \leq \left( \left\vert\left\Vert BA^{-1} \right\Vert\right\vert _{\mathrm{op}}  \right)^{k+1}\to 0
+\end{aligned}
+$$ 
+so it's safe to say that $(BA^{-1})^{k+1}\to 0$, thus set $k\to\infty$ in the result of **(i)** we have
+$$
+\begin{aligned}
+    \begin{cases}
+        (A-B)\sum_{i=0}^\infty A^{-1}(BA^{-1})^i=I&\Rightarrow (A-B)^{-1}=\sum_{i=0}^\infty A^{-1}(BA^{-1})^{i}\\
+        (A+B)\sum_{i=0}^\infty A^{-1}(-BA^{-1})^i=I&\Rightarrow (A+B)^{-1}=\sum_{i=0}^\infty (-1)^i A^{-1}(BA^{-1})^{i}
+    \end{cases}
+\end{aligned}
+$$ 
+
+
+## (b)
+
+With notation $D(\symbfit{\delta })=\mathrm{diag}(\symbfit{\delta })$ we have
+$$
+\begin{aligned}
+    \hat{\beta }_{\symbfit{\delta }}=\mathop{\arg\min}\limits_{b} \dfrac{1}{n}(Y-Xb)'(I-D(\symbfit{\delta }))(Y-Xb) 
+\end{aligned}
+$$ 
+Solution is given at $\dfrac{\partial^{} }{\partial b^{}}=0$, which is
+$$
+\begin{aligned}
+    0=&\dfrac{\partial^{} }{\partial b^{}}\dfrac{1}{n}(Y-Xb)'(I-D(\symbfit{\delta }))(Y-Xb) \\
+    =& -\dfrac{1}{n}X'(I-D(\symbfit{\delta }))Y+\dfrac{1}{n}X'(I-D(\symbfit{\delta }))Xb \\
+    \Rightarrow \hat{\beta }_{\symbfit{\delta }}=&(X'(I-D(\symbfit{\delta }))X)^{-1}X'(I-D(\symbfit{\delta }))Y
+\end{aligned}
+$$ 
+
+## (c)
+
+Using the result from **(a)-(ii)** we have
+$$
+\begin{aligned}
+    (X'(I-D(\symbfit{\delta }))X)^{-1}=&(X'X - X'D(\symbfit{\delta })X)^{-1}\\
+    =& \sum_{i=0}^\infty (X'X)^{-1}\big(X'D(\symbfit{\delta })X(X'X)^{-1}\big)^i\\
+    =& (X'X)^{-1}(I+ X'D(\symbfit{\delta })X(X'X)^{-1} + O(\left\Vert \symbfit{\delta } \right\Vert ^2))
+\end{aligned}
+$$ 
+i.e.
+$$
+\begin{aligned}
+    \hat{\beta }_{\symbfit{\delta }}=&(X'(I-D(\symbfit{\delta }))X)^{-1}X'(I-D(\symbfit{\delta }))Y\\
+    =& (X'X)^{-1}(I+ X'D(\symbfit{\delta })X(X'X)^{-1} + O(\left\Vert \symbfit{\delta } \right\Vert ^2))X'(I-D(\symbfit{\delta }))Y\\
+    =& (X'X)^{-1}X'Y + \big( (X'X)^{-1}X'D(\symbfit{\delta })X(X'X)^{-1}X'Y-(X'X)^{-1}X'D(\symbfit{\delta })Y \big) + O(\left\Vert \symbfit{\delta } \right\Vert^2 )\\
+    =&\hat{\beta }+\dfrac{1}{n}\hat{C}^{-1}X'D(\symbfit{\delta })(\hat{y}-y)+O(\left\Vert \symbfit{\delta } \right\Vert^2 )
+\end{aligned}
+$$ 
+in which $\hat{C}=\frac{1}{n}X'X$.
+
+## (d)
+
+If $\symbfit{\delta }:=\delta e_i$, we have $D(\symbfit{\delta })_{kl}=\delta _{ki}\delta _{il}$ in which $\delta _{\, \cdot \, \, \cdot \, }$ is the Kronecker delta. So
+$$
+\begin{aligned}
+    \hat{\beta }_{\symbfit{\delta }=\delta e_i}=&+\dfrac{1}{n}\hat{C}^{-1}X'\delta _{\, \cdot \, i}\delta _{i\, \cdot \, }(\hat{y}-y)+O(\left\Vert \symbfit{\delta } \right\Vert^2 )\\
+    \Rightarrow \lim_{\delta \to 0}\dfrac{\hat{\beta }_{\delta e_i}- \hat{\beta }_{\symbfit{\delta }}}{\delta }=&\lim_{\delta \to 0}\dfrac{1}{n}\hat{C}^{-1}X'\delta _{\, \cdot \, i}\delta _{i\, \cdot \, }(\hat{y}-y)+O(\left\Vert \symbfit{\delta } \right\Vert )\\
+    =&\dfrac{1}{n}\hat{C}^{-1}x_i(\hat{y}_i-y_i):=\mathsf{iinf}(\hat{\beta },i)
+\end{aligned}
+$$ 
+
+
+## (e)
+
+From the plot we can see that removing a few points seems do not affect the p-value much, for most variables. Only on `Height` variable, removing one point can change the p-value a lot.
+
+
+```{r, eval = TRUE, include = TRUE, warning = FALSE}
+library('tidyverse')
+```
+
+
+```{r, eval = TRUE, include = TRUE, warning = FALSE}
+# i) data read in and preprocessing
+aba <- read.csv('abalone.data', header = FALSE)
+df <- data.frame(aba[,2:8])
+df$isM <- ifelse(aba[,1] == 'M', 1, 0)
+df$isF <- ifelse(aba[,1] == 'F', 1, 0)
+
+# i) normalization to l_2 norm=\sqrt{n} and mean centering, then add intercept and y
+df <- df %>% mutate(across(everything(), scale))
+df$intercept <- 1
+df$y <- aba[,9]
+
+# ii) compute iinf: n\times d matrix
+n <- nrow(df)
+d <- ncol(df) - 1
+X <- df[,1:d] %>% as.matrix()
+C.hat <- t(X) %*% X / n
+beta.hat <- solve(C.hat, t(X) %*% df$y / n)
+y.hat <- X %*% beta.hat
+iinf.mat <-  diag(c(y.hat)) %*% X %*% solve(C.hat) / n
+
+# iii) find index set I with |I|=k
+find_maximize_idxs <- function(beta, iinf, k){
+    order.iinf <- order(iinf, decreasing = TRUE)
+    # for simplicity, we just try two ways: all negative and all positive
+    upper.idx <- order.iinf[1:k]
+    lower.idx <- order.iinf[(n-k+1):n]
+    upper.sum <- beta + sum(iinf[upper.idx])
+    lower.sum <- beta + sum(iinf[lower.idx])
+    ret.idx <- ifelse( abs(upper.sum) > abs(lower.sum), upper.idx, lower.idx)
+    return(ret.idx)
+}
+ks <- 1:20
+p.value.mat <- matrix(NA, nrow = d, ncol = length(ks))
+for(j in 1:d){
+    iinf.j <- iinf.mat[,j]
+    beta.hat.j <- beta.hat[j]
+
+    for(k in ks){
+        maximize.idxs <- find_maximize_idxs(beta.hat.j, iinf.j, k)
+        # run regression without these indices, and test null: beta_j=0
+        X.jk <- X[-maximize.idxs,]
+        y.jk <- df$y[-maximize.idxs]
+        lm.jk <- lm(y.jk ~ X.jk - 1)
+        p.value.jk <- summary(lm.jk)$coefficients[j,4]
+        p.value.mat[j,k] <- p.value.jk
+    }
+}
+# k=0 case is the original model
+lm.0 <- lm(df$y ~ X - 1)
+p.value.mat <- cbind(summary(lm.0)$coefficients[,4], p.value.mat)
+
+# plot p-value against k
+p.value.df <- data.frame(t(p.value.mat))
+names(p.value.df) <- c('Length', 'Diameter', 'Height', 'Whole weight', 'Shucked weight', 'Viscera weight', 'Shell weight', 'isM', 'isF', 'intercept')
+p.value.df <- log(p.value.df)
+p.value.df$k <- 0:20
+
+p.value.df %>% 
+    pivot_longer(cols = -k, names_to = 'variable', values_to = 'p.value') %>% 
+    ggplot(aes(x = k, y = p.value, color = variable)) + 
+    geom_line() + 
+    geom_point() + 
+    theme_bw() + 
+    theme(legend.position = 'bottom') + 
+    labs(x = 'k', y = 'p-value', title = 'p-value against k')
+```
+
+```{r, eval = TRUE, include = TRUE, warning = FALSE}
+
+```

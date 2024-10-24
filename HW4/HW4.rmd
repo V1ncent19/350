@@ -1,0 +1,179 @@
+---
+title: "Regression Analysis HW4"
+author: "Tuorui Peng, tuoruipeng2028@u.northwestern.edu"
+documentclass: ctexart
+geometry: "left=2cm,right=2cm,top=2cm,bottom=2cm"
+output:
+    pdf_document:
+        latex_engine: xelatex
+---
+
+## (a)
+
+-   [i] $e=\log 1/p$: we have
+  
+$$
+\begin{aligned}
+    \mathbb{E}\left[ e \right] =& \mathbb{E}\left[ \log \dfrac{1}{p } \right] = \int_{t=0}^\infty \mathbb{P}\left( \log \dfrac{1}{p} \geq t  \right) \,\mathrm{d}t =\int_{t=0}^\infty \mathbb{P}\left( p\leq e^{-t} \right)\,\mathrm{d}t \leq \int_{t=0}^\infty e^{-t}\,\mathrm{d}t = 1 
+\end{aligned}
+$$ 
+
+-   [ii] $e=1/2\sqrt{p}$: note that in this case $e\in[1/2,\infty]$, we have
+
+$$
+\begin{aligned}
+    \mathbb{E}\left[ e  \right] =& \int_{t=1/2}^\infty \mathbb{P}\left( \dfrac{1}{2\sqrt{p}}\geq t  \right) \,\mathrm{d}t= \int_{t=1/2}^\infty \mathbb{P}\left( p\leq \dfrac{1}{4t^2} \right)\,\mathrm{d}t = \int_{t=1/2}^\infty \dfrac{1}{4t^2}\,\mathrm{d}t = \dfrac{1}{2}<1 
+\end{aligned}
+$$ 
+
+## (b)
+
+For OLS estimation, we know that 
+$$
+\begin{aligned}
+    T_{j}=\dfrac{\hat{\beta }_j}{s_n\sqrt{[(X'X)^{-1}]_{jj}}}\sim t_{n-d}\Rightarrow T_j^2\sim F_{1,n-d}
+\end{aligned}
+$$ 
+
+In this way we have
+$$
+\begin{aligned}
+    \mathbb{E}\left[ cM_j(m) \right]=&c\mathbb{E}\left[ (T_j^2)^m \right]  \\
+    =& c (n-d)^m \dfrac{\Gamma(\frac{1}{2}+m)\Gamma(\frac{n-d}{2}-m)}{\Gamma (\frac{1}{2}\Gamma(\frac{n-d}{2}))} \leq 1\\
+    \Rightarrow c \leq &(n-d)^{-m}  \dfrac{\Gamma (\frac{1}{2}\Gamma(\frac{n-d}{2}))}{\Gamma(\frac{1}{2}+m)\Gamma(\frac{n-d}{2}-m)},\quad m\leq \dfrac{n-d}{2}
+\end{aligned}
+$$ 
+
+## (c)
+
+We have
+$$
+\begin{aligned}
+    \mathbb{P}\left( \text{falsely rejection} \right)=& \mathbb{P}\left( E\geq \dfrac{1}{\alpha } \right) \mathop{ \leq }\limits^{(i)} \dfrac{\mathbb{E}\left[ E  \right] }{1/\alpha } \mathop{ \leq  }\limits^{(ii)}  \alpha   
+\end{aligned}
+$$ 
+
+in which $(i)$ uses Markov's inequality and $(ii)$ uses the fact that $\mathbb{E}\left[ E  \right] \leq 1$.
+
+## (d)
+
+-   [(i)] Clearly we have
+
+
+$$
+\begin{aligned}
+    \mathrm{card}(\mathcal{N}\cap\mathcal{R})=&\# \{j: j\in\mathcal{N} \& j\in\mathcal{R}\}=\sum_{j\in\mathcal{N}}\mathbf{1}(j\in\mathcal{R}) 
+    \Rightarrow \dfrac{\mathrm{card}(\mathcal{N}\cap\mathcal{R})}{\max\{R,1\}}\leq \sum_{j\in\mathcal{N}}\dfrac{\mathbf{1}(j\in\mathcal{R})}{\max\{R,1\}}
+\end{aligned}
+$$  
+
+-   [(ii)] With our test being the e-value test, we have
+
+
+$$
+\begin{aligned}
+    \mathbf{1}(j\in\mathcal{R})=&\mathbf{1}(E_j\geq \dfrac{N}{R\alpha })\leq \mathbf{1}(E_j\geq \dfrac{N}{R\alpha })\dfrac{R\alpha E_j}{N}\\
+    \Rightarrow \sum_{j\in\mathcal{N}}\dfrac{\mathbf{1}(j\in\mathcal{R})}{\max\{R,1\}}\leq & \sum_{j\in\mathcal{N}}\dfrac{\mathbf{1}(E_j\geq \dfrac{N}{R\alpha })}{\max\{R,1\}}\cdot \dfrac{R\alpha E_j}{N} \\
+\end{aligned}
+$$ 
+
+-   [(iii)] We have
+
+$$
+\begin{aligned}
+    \dfrac{\mathbf{1}(j\in\mathcal{R})R}{\max\{R,1\}}\leq& \dfrac{R}{\max\{R,1\}}\leq 1
+    \Rightarrow \sum_{j\in\mathcal{N}}\dfrac{\mathbf{1}(j\in\mathcal{R})}{\max\{R,1\}}\cdot \dfrac{R\alpha E_j}{N}\leq  \sum_{j\in\mathcal{N}}1\cdot\dfrac{\alpha E_j}{N}= \dfrac{\alpha }{N}\sum_{j\in\mathcal{N}}E_j
+\end{aligned}
+$$ 
+
+## (e)
+
+Using the result in (d): $\mathrm{FDP}=\mathrm{card}(\mathcal{N}\cap\mathcal{R})\leq\dfrac{\alpha }{N}\sum_{j\in\mathcal{N}}E_j$, we have
+$$
+\begin{aligned}
+    \mathrm{FDR}=&\mathbb{E}\left[ \mathrm{FDP}  \right]  =\mathbb{E}\left[  \mathrm{card}(\mathcal{N}\cap\mathcal{R})\right] 
+    \leq  \mathbb{E}\left[ \dfrac{\alpha }{N}\sum_{j\in\mathcal{N}}E_j \right]
+    = \dfrac{\alpha }{N}\sum_{j\in\mathcal{N}}\mathbb{E}\left[ E_j \right]\leq \dfrac{ \mathrm{card{\mathcal{N}}} }{N} \alpha
+\end{aligned}
+$$ 
+
+## (f)
+
+Simulation study on multiple regression model: from the figure below we can see that 
+
+-   Bonferroni's method seems to keep making false discovery in this case, probably due to the noise effect in the data (note that our sd of signal is 0.1 while the sd of noise is 1);
+-   $e$-value method with too low $m$, say $m=1$ seems to be too conservative to make any rejection, we can see that number of rejection for it is always 0;
+-   BY's method and $e$-value methods with mediate $m$ value (e.g. $m=4,8$) are giving similar results, and they are both better than Bonferroni's method. 
+-   And we see that with higher $m$ value, we are having higher FDP. Intuitively, higher $m$ value yields heavier tailed $M_j(m)$ distribution (concentrate at 0), which makes it more likely to make false discovery.  
+
+
+
+```{r, eval = TRUE, include = TRUE, warning = FALSE}
+library(ggplot2)
+library(reshape2)
+
+N <- 1e3
+alpha <- 0.1
+m_seq <- 2^(0:4)
+fdp.mat <- matrix(0, nrow = N, ncol = 2 + length(m_seq))
+num_rej.mat <- matrix(0, nrow = N, ncol = 2 + length(m_seq))
+c_m <- function(m,n,d){
+    exp( lgamma(1/2)+lgamma((n-d)/2)-lgamma(1/2+m)-lgamma((n-d)/2-m) )/((n-d)^m)
+}
+for(i in 1:N){
+    set.seed(i)
+    # construct data
+    n <- 900
+    d <- 30
+    X <- matrix(rnorm(n*d), nrow = n, ncol = d)
+    beta.true <- c(rnorm(10,0,0.1), rep(0,20))
+    y <- X %*% beta.true + rnorm(n,0,1)
+    lm.fit <- lm(y~0+X)
+    p <- summary(lm.fit)$coefficients[,4]
+    ## method (i): bonferroni correction
+    R <- sum(p < alpha / d)
+    fdp.bonf <- sum(p[1:10] < alpha / d) / max(R,1)
+
+    fdp.mat[i,1] <- fdp.bonf
+    num_rej.mat[i,1] <- R
+    ## method (ii): benjamini-yekutieli: find largest (k) s.t. p_{(k)} \leq k\alpha / c_d*d and reject all p_{(1)},...,p_{(k)}
+    c_d <- sum(1 / (1:d))
+    order.p <- order(p)
+    leq_idx_in_ord <- p[order.p] <= (1:d) * alpha / c_d / d
+    k <- ifelse(sum(leq_idx_in_ord == TRUE) == 0, 0, max(which(leq_idx_in_ord)))
+    R <- k
+    null_idx <- order.p[1:10]
+    fdp.by <- length(intersect( which(leq_idx_in_ord), null_idx)) / max(R,1)
+
+    fdp.mat[i,2] <- fdp.by
+    num_rej.mat[i,2] <- R
+    ## method (iii): e-value
+    t_j <- lm.fit$coefficients / summary(lm.fit)$coefficients[,2]
+    for(m in m_seq){
+        c.m <- c_m(m,n,d)
+        cM_jm <- c.m * t_j^(2*m)
+        E_j <- cM_jm
+        order.e <- order(E_j, decreasing = TRUE)
+        geq_idx_in_ord <- E_j[order.e] >= d / (1:d) / alpha
+        k <- ifelse(sum(geq_idx_in_ord == TRUE) == 0, 0, max(which(geq_idx_in_ord)))
+        R <- k
+        null_idx <- order.e[1:10]
+        fdp.e <- length(intersect( which(geq_idx_in_ord), null_idx)) / max(R,1)
+
+        col_idx <- which(m_seq == m) + 2
+        fdp.mat[i,col_idx] <- fdp.e
+        num_rej.mat[i,col_idx] <- R
+    }
+}
+
+## plot histogram of FDP, for each columns in fdp.mat
+fdp.df <- data.frame(fdp.mat)
+colnames(fdp.df) <- c("bonferroni", "by", paste0("e-value, m=", m_seq))
+
+fdp.df.melt <- melt(fdp.df)
+
+ggplot(fdp.df.melt, aes(x = value, fill = variable)) + geom_histogram(position = "identity", alpha = 0.5, bins = 20) + facet_wrap(~variable, scales = "free") + theme_bw() + theme(legend.position = "none")
+
+summary(data.frame(num_rej.mat))
+apply(fdp.mat, 2, mean)
+```
